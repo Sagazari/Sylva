@@ -82,7 +82,7 @@ async function responder(canal, { modo = 'resposta', tardio = null, alvo = null,
     const pessoas = quemEstaNoChat(e);
     const prompt = persona.montarPrompt({
       historico: e.historico, estado: st, humor: rotina.humor(), nome: NOME(), modo, tardio,
-      memorias: memoria.resumo(canal.guildId, pessoas),
+      direto, memorias: memoria.resumo(canal.guildId, pessoas),
     });
     const { mensagens, memorias } = await llm.gerar({ system: persona.system(NOME()), prompt });
     salvarMemorias(canal, e, memorias); // ela pode aprender algo mesmo sem responder
@@ -114,12 +114,14 @@ async function avaliar(canal, client) {
   if (!direto && Date.now() - e.ultimaFala < 20000) return; // não emenda resposta em resposta
 
   const base = direto ? 0.97 : interesse ? 0.5 : conversando ? 0.45 : 0.1;
-  const p = direto ? Math.min(0.98, st.disp * 1.6 + 0.03) : base * st.disp;
+  // Quando alguém chama a Sylva diretamente ou responde a uma mensagem dela,
+  // não aplique a chance aleatória de ignorar: envie a conversa para a Groq.
+  const p = direto ? 1 : base * st.disp;
 
   if (chance(p)) {
     e.ocupado = true; // reserva a vez enquanto "demora" pra ver a mensagem
     const [a, b] = st.atraso;
-    await sleep(direto ? rand(a, Math.max(a, Math.floor((a + b) / 2))) : rand(a, b));
+    await sleep(direto ? rand(1500, 4000) : rand(a, b));
     e.ocupado = false;
     if (!store.ativo(canal.id)) return;
     return responder(canal, { alvo, direto });

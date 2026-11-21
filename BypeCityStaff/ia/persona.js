@@ -64,7 +64,7 @@ CURIOSIDADE E MEMÓRIA
 FORMATO: responda só em JSON {"mensagens": ["..."], "memorias": [{"usuario": "...", "fato": "..."}]}. "memorias" pode ficar vazio.`;
 }
 
-function montarPrompt({ historico, estado, humor, nome, modo, tema, tardio, memorias }) {
+function montarPrompt({ historico, estado, humor, nome, modo, tema, tardio, direto, memorias }) {
   const hist = historico.slice(-18).map((m) => (m.ia ? `${nome} (você): ${m.texto}` : `${m.autor}: ${m.texto}`)).join('\n');
   const hora = `${String(estado.hora).padStart(2, '0')}:${String(estado.minuto).padStart(2, '0')}`;
 
@@ -73,6 +73,8 @@ function montarPrompt({ historico, estado, humor, nome, modo, tema, tardio, memo
     tarefa = `o chat tá parado faz um tempo. puxe assunto por conta própria sobre: ${tema || pick(TEMAS)}. fale como se tivesse acabado de lembrar disso (1 a 3 mensagens). não repita algo que você já falou no histórico.`;
   } else if (tardio) {
     tarefa = `você demorou pra responder porque estava ${tardio}. comece comentando isso rapidinho (tipo "ai desculpa tava ...") e responda o que falaram com você.`;
+  } else if (direto) {
+    tarefa = 'alguém chamou você pelo nome, mencionou você ou respondeu uma mensagem sua. responda diretamente ao conteúdo mais recente, com naturalidade e personalidade. não devolva mensagens vazias só por falta de assunto.';
   } else {
     tarefa = 'veja as mensagens mais recentes e decida se ela falaria algo agora. se falar, reaja ao que acabaram de dizer, direto ao ponto. se não fizer sentido, devolva a lista de mensagens vazia. se alguém contou algo sobre si mesmo, guarde em memorias.';
   }
