@@ -20,6 +20,19 @@ npm start        # liga o bot
 
 > **Importante:** no servidor, coloque o cargo do bot **acima** dos cargos que ele precisa gerenciar/punir.
 
+## Hospedagem no Render com UptimeRobot
+
+O projeto inicia um servidor HTTP simples junto com o bot para o Render detectar a porta e o UptimeRobot monitorar a rota `/health`.
+
+Para usar como **Web Service** no Render:
+
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Não defina uma porta fixa nas variáveis; o app usa automaticamente `PORT` fornecida pelo Render.
+- No UptimeRobot, crie um monitor **HTTP(s)** apontando para `https://SUA-URL-DO-RENDER/health`, com intervalo de 5 minutos.
+
+A rota retorna HTTP 200 com o estado do processo. Isso ajuda a evitar que o Web Service gratuito entre em repouso por falta de requisições, mas não garante disponibilidade contínua: limites, políticas e mudanças do Render podem afetar o serviço. O UptimeRobot não reinicia o processo nem corrige falhas do bot.
+
 ## Criar cargos em massa
 
 ```
@@ -99,7 +112,7 @@ Os avisos ficam salvos em `data/warns.json`.
 **Reações de estranhamento:** quando acha algo esquisito ela solta ox, oxkkkkk, olkk, n sabia véi, juroh??, nadave, impossivel e variações. Dá para acrescentar mais em `ia/persona.js`.
 
 **Personalizar:** a rotina fica em `ia/rotina.js`, a personalidade e as gírias em `ia/persona.js`, o jeito de digitar em `ia/humanizar.js`.
-Se o Groq der erro 404 ou 400, troque `GROQ_MODEL` por um modelo atual (veja console.groq.com/docs/models).
+O modelo padrão configurado é `openai/gpt-oss-120b`. Se sua conta Groq não tiver acesso a ele, escolha outro modelo disponível em https://console.groq.com/docs/models e atualize `GROQ_MODEL` no Render.
 
 ## Adicionar novos comandos
 
